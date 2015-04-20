@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 
 #
 # This program extracts all the image links from the web page given on 
@@ -14,7 +14,7 @@
 
 use strict;
 
-# use HTML::Element;
+use HTML::Element;
 use HTML::Parser;
 use HTML::TreeBuilder;
 use HTTP::Request;
@@ -81,7 +81,7 @@ $html_tree->parse( $response->content );
 #      prepends this base to the current $link.
 #
 
-foreach my $item (@{ $html_tree->extract_links( "img" )}) {
+foreach my $item (@{ $html_tree->extract_links( )}) {
 
     my $link = shift @$item;
     my $furl = (new URI::URL $link)->abs( $response->base );
