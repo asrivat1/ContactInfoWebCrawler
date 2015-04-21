@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 
 #
 # This program walks through HTML pages, extracting all the links to other
@@ -129,15 +129,15 @@ while (@search_urls) {
 
     foreach my $link (@related_urls) {
 
-	my $full_url = eval { (new URI::URL $link, $response->base)->abs; };
-	    
-	delete $relevance{ $link } and next if $@;
+        my $full_url = eval { (new URI::URL $link, $response->base)->abs; };
+            
+        delete $relevance{ $link } and next if $@;
 
-	$relevance{ $full_url } = $relevance{ $link };
-	delete $relevance{ $link } if $full_url ne $link;
+        $relevance{ $full_url } = $relevance{ $link };
+        delete $relevance{ $link } if $full_url ne $link;
 
-	push @search_urls, $full_url and $pushed{ $full_url } = 1
-	    if ! exists $pushed{ $full_url };
+        push @search_urls, $full_url and $pushed{ $full_url } = 1
+            if ! exists $pushed{ $full_url };
 	
     }
 
