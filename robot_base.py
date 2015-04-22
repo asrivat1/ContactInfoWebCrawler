@@ -14,12 +14,12 @@ RC_OK = 200
 logFile = open(sys.argv[1], "w")
 contentFile = open(sys.argv[2], "w")
 relevance = defaultdict(lambda: 0)
+wanted_urls = []
 
 def main():
     base_url = sys.argv[3]
 
     search_urls = [base_url]
-    wanted_urls = []
     pushed = {}
 
     while search_urls:
@@ -37,7 +37,7 @@ def main():
             continue
 
         logFile.write(str(url_obj.info()))
-        if url_obj.getcode() != RC_OK or not wanted_content(url_obj.info()["Content-Type"]):
+        if url_obj.getcode() != RC_OK or not wanted_content(url_obj.info()["Content-Type"], url):
             continue
 
         # GET request, same thing
@@ -59,7 +59,10 @@ def main():
         # reorder the urls based on relevance
         search_urls = sorted(search_urls, key=(lambda a: relevance[a]))
 
-def wanted_content(content):
+def wanted_content(content, url):
+    # check if this is something we are looking for
+    if "pdf" in content or "postscrpt" in content or "text/html" in content:
+        wanted_urls.append(url)
     return "text/html" in content
 
 def extract_content(content, url):
