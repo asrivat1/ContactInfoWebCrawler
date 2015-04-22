@@ -9,6 +9,7 @@ import urllib2
 from urllib2 import urlopen
 from urllib2 import Request
 from collections import defaultdict
+import re
 
 RC_OK = 200
 logFile = open(sys.argv[1], "w")
@@ -66,14 +67,26 @@ def wanted_content(content, url):
     return "text/html" in content
 
 def extract_content(content, url):
-    email = ""
-    phone = ""
+    emails = []
+    phones = []
+    cities = []
 
-    contentFile.write("(%s EMAIL %s)\n" % (url, email))
-    logFile.write("(%s EMAIL %s)\n" % (url, email))
+    # search through document and find emails and phones and addresses
+    emails = re.findall(r"[^\s<>]+@[^\s<>]+\.[^\s<>]+", content)
+    phones = re.findall(r"\(?\d{3}\)?-?\d{3}-?\d{4}", content)
+    cities = re.findall(r"[A-Za-z]+, [A-Za-z]+ \d{5}", content)
 
-    contentFile.write("(%s PHONE %s)\n" % (url, phone))
-    logFile.write("(%s PHONE %s)\n" % (url, phone))
+    for email in emails:
+        contentFile.write("(%s EMAIL %s)\n" % (url, email))
+        logFile.write("(%s EMAIL %s)\n" % (url, email))
+
+    for phone in phones:
+        contentFile.write("(%s PHONE %s)\n" % (url, phone))
+        logFile.write("(%s PHONE %s)\n" % (url, phone))
+
+    for city in cities:
+        contentFile.write("(%s CITY %s)\n" % (url, city))
+        logFile.write("(%s CITY %s)\n" % (url, city))
 
 def grab_urls(content, url):
     urls = {}
