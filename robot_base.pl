@@ -48,8 +48,8 @@ open CONTENT, ">$content_file";
 # I don't want to be flamed by web site administrators for
 # the lousy behavior of your robots. 
 
-my $ROBOT_NAME = 'YourLoginBot/1.0';
-my $ROBOT_MAIL = 'yourlogin@cs.jhu.edu';
+my $ROBOT_NAME = 'asrivat1Bot/1.0';
+my $ROBOT_MAIL = 'asrivat1@cs.jhu.edu';
 
 #
 # create an instance of LWP::RobotUA. 
@@ -149,6 +149,7 @@ while (@search_urls) {
     @search_urls = 
 	sort { $relevance{ $a } <=> $relevance{ $b }; } @search_urls;
 
+    print @search_urls, "\n";
 }
 
 close LOG;
@@ -253,35 +254,34 @@ sub grab_urls {
     
   skip:
     while ($content =~ s/<\s*[aA] ([^>]*)>\s*(?:<[^>]*>)*(?:([^<]*)(?:<[^aA>]*>)*<\/\s*[aA]\s*>)?//) {
-	    
-	my $tag_text = $1;
-	my $reg_text = $2;
-	my $link = "";
+        my $tag_text = $1;
+        my $reg_text = $2;
+        my $link = "";
 
-	if (defined $reg_text) {
-	    $reg_text =~ s/[\n\r]/ /;
-	    $reg_text =~ s/\s{2,}/ /;
+        if (defined $reg_text) {
+            $reg_text =~ s/[\n\r]/ /;
+            $reg_text =~ s/\s{2,}/ /;
 
-	    #
-	    # compute some relevancy function here
-	    #
-	}
+            #
+            # compute some relevancy function here
+            #
+        }
 
-	if ($tag_text =~ /href\s*=\s*(?:["']([^"']*)["']|([^\s])*)/i) {
-	    $link = $1 || $2;
+        if ($tag_text =~ /href\s*=\s*(?:["']([^"']*)["']|([^\s])*)/i) {
+            $link = $1 || $2;
 
-	    #
-	    # okay, the same link may occur more than once in a
-	    # document, but currently I only consider the last
-	    # instance of a particular link
-	    #
+            #
+            # okay, the same link may occur more than once in a
+            # document, but currently I only consider the last
+            # instance of a particular link
+            #
 
-	    $relevance{ $link } = 1;
-	    $urls{ $link }      = 1;
-	}
+            $relevance{ $link } = 1;
+            $urls{ $link }      = 1;
+        }
 
-	print $reg_text, "\n" if defined $reg_text;
-	print $link, "\n\n";
+        print $reg_text, "\n" if defined $reg_text;
+        print $link, "\n\n";
     }
 
     return keys %urls;   # the keys of the associative array hold all the
