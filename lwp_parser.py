@@ -17,8 +17,8 @@ def main():
     for element, attribute, link, pos in html.iterlinks():
         # only print if it's a local link and not self-referential
         link_domain = urlparse(link).netloc
-        selfReference = (url + "#") in link
-        if link_domain == domain and not selfReference:
+        selfReference = (url.split("//")[1] + "#") in link
+        if (link_domain == domain or link_domain == "www." + domain) and not selfReference:
             print link
 
 if __name__ == "__main__":

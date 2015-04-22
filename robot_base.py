@@ -24,6 +24,7 @@ def main():
 
     while search_urls:
         url = search_urls.pop()
+        logFile.write(url)
         # skip if url is malformed or not http
         if urlparse(url).scheme != "http":
             continue
@@ -48,7 +49,7 @@ def main():
         # links
         html = url_obj.read()
         extract_content(html, url)
-        related_urls = grab_urls(html, base_url)
+        related_urls = grab_urls(html, url)
 
         for link in related_urls:
             if link not in pushed.keys():
@@ -57,7 +58,6 @@ def main():
 
         # reorder the urls based on relevance
         search_urls = sorted(search_urls, key=(lambda a: relevance[a]))
-        print search_urls
 
 def wanted_content(content):
     return "text/html" in content
@@ -72,13 +72,22 @@ def extract_content(content, url):
     contentFile.write("(%s PHONE %s)\n" % (url, phone))
     logFile.write("(%s PHONE %s)\n" % (url, phone))
 
-def grab_urls(content, base_url):
+def grab_urls(content, url):
     urls = {}
+    domain = urlparse(url).netloc
     html = document_fromstring(content)
-    html.make_links_absolute(base_url, resolve_base_href=True)
+    html.make_links_absolute(url, resolve_base_href=True)
 
     for element, attribute, link, pos in html.iterlinks():
         if attribute != "href":
+            continue
+
+        # skip if not on our domain
+        if urlparse(link).netloc != domain and urlparse(link).netloc != "www." + domain:
+            continue
+
+        # skip if self referential
+        if (url.split("//")[1] + "#") in link:
             continue
 
         text = element.text_content() if len(element) == 0 else element[0].text_content()
