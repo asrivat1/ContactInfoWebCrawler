@@ -5,3 +5,15 @@ General Notes:
 ==============
 
 Like the previous one, I decided to do this assignment in Python instead of Perl. Therefore all of my completed files will have a .py extension, and those that do not have not been altered.
+
+Notes on Part 1:
+================
+
+The assignment description was a bit ambiguous as to whether we were supposed to only retrieve links that are on the same domain, or only links which leave the domain. Given the nature of part 2, it was my understanding that we were supposed to do the former, which is what I did.
+
+Notes on Part 2:
+================
+
+The assignment was also a little unclear as to what we were supposed to do with the wanted_url array, so I decided to print it out after examining each url in the search_urls stack. In other words, after examining all of the links on a page, I print out all of the ones that lead to PDF or postscript separately.
+
+For my relevancy function, I decided to examine the overlap between the link under consideration and its associated text and the url of the page we are currently on. To do that, I break each up into words and count the number of times that a word in the link's url or the associated text shows up in the url of the page we are on. This overlap count becomes the relevance which we return.

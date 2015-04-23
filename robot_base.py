@@ -25,7 +25,7 @@ def main():
 
     while search_urls:
         url = search_urls.pop()
-        logFile.write(url)
+        logFile.write(url + "\n")
         # skip if url is malformed or not http
         if urlparse(url).scheme != "http":
             continue
@@ -60,9 +60,17 @@ def main():
         # reorder the urls based on relevance
         search_urls = sorted(search_urls, key=(lambda a: relevance[a]))
 
+        # print any wanted urls we have found up til this point
+        if wanted_urls:
+            print "Wanted urls:"
+        while wanted_urls:
+            print wanted_urls.pop()
+        print
+
+
 def wanted_content(content, url):
     # check if this is something we are looking for
-    if "pdf" in content or "postscrpt" in content or "text/html" in content:
+    if "pdf" in content or "postscrpt" in content:
         wanted_urls.append(url)
     return "text/html" in content
 
@@ -72,7 +80,7 @@ def extract_content(content, url):
     cities = []
 
     # search through document and find emails and phones and addresses
-    emails = re.findall(r"[^\s<>]+@[^\s<>]+\.[^\s<>]+", content)
+    emails = re.findall(r"[^\s()<>]+@[A-Za-z0-9-]+\.[A-Za-z]+", content)
     phones = re.findall(r"\(?\d{3}\)?-?\d{3}-?\d{4}", content)
     cities = re.findall(r"[A-Za-z]+, [A-Za-z]+ \d{5}", content)
 
@@ -110,7 +118,7 @@ def grab_urls(content, url):
         text = text.lstrip() if text is not None else ""
         # compute relevancy here
 
-        relevance[link] = 1
+        relevance[link] = relevancy(link, text, url)
         urls[link] = 1
 
         if text != "":
@@ -119,6 +127,22 @@ def grab_urls(content, url):
         print
 
     return urls.keys()
+
+def relevancy(link, text, url):
+    # compute how relevant these are to the original url
+    link_words = re.findall(r"[A-Za-z]+", link)
+    url_words = re.findall(r"[A-Za-z]+", url)
+    text_words = re.findall(r"[A-Za-z]+", text)
+
+    overlap = 0
+    for word in link_words:
+        if word in url_words:
+            overlap += 1
+    for word in text_words:
+        if word in url_words:
+            overlap += 1    
+
+    return overlap
 
 if __name__ == "__main__":
     main()
